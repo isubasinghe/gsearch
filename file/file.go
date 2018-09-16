@@ -13,7 +13,7 @@ import (
 // ScoreData stores the scores and indexes for a single query term
 type ScoreData struct {
 	Index int
-	Score float32
+	Score float64
 }
 
 // WordData An abstraction layer for word score data
@@ -101,7 +101,7 @@ func readFile(fname string) ([]ScoreData, error) {
 		return nil, err
 	}
 	for {
-		var score float32
+		var score float64
 		var index int
 		out, err := fmt.Fscanf(file, "%d %f\n", &index, &score)
 		if err != nil {
