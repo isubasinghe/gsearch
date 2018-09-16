@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"sort"
 	"strings"
 )
 
@@ -20,14 +21,19 @@ type WordData struct {
 	Data map[string][]ScoreData
 }
 
+// NewWordData creates the memory for use by the struct
+func (w *WordData) NewWordData() {
+	w.Data = make(map[string][]ScoreData)
+}
+
 // InsertScores inserts the scores for a given word
 func (w *WordData) InsertScores(word string, scoreData []ScoreData) {
 	w.Data[word] = scoreData
 }
 
 // GetScores gets the scores for a given word
-func (w *WordData) GetScores(word string) {
-
+func (w *WordData) GetScores(word string) []ScoreData {
+	return w.Data[word]
 }
 
 // SaveToGOB save the data structure
@@ -107,13 +113,27 @@ func readFile(fname string) ([]ScoreData, error) {
 		fileScore := ScoreData{Index: index, Score: score}
 		scoreData = append(scoreData, fileScore)
 	}
+	sort.Slice(scoreData, func(i, j int) bool {
+		return scoreData[i].Score > scoreData[j].Score
+	})
 	return scoreData, nil
+}
+
+func LoadDataGob(path string) (WordData, error) {
+	var wordData = new(WordData)
+	wordData.NewWordData()
+	err := readGob("./data.gob", wordData)
+	if err != nil {
+		return *wordData, err
+	}
+	return *wordData, nil
 }
 
 // LoadData loads the word data
 func LoadData(path string) (WordData, error) {
 	var wordData WordData
 	_ = wordData
+	wordData.NewWordData()
 
 	files, err := ioutil.ReadDir(path)
 	if err != nil {
@@ -124,10 +144,16 @@ func LoadData(path string) (WordData, error) {
 		if !file.IsDir() {
 			if strings.Contains(file.Name(), ".txt") {
 				fname := strings.Replace(file.Name(), ".txt", "", -1)
-				scores := readFile("./data/" + file.Name())
+				scores, err := readFile("./data/" + file.Name())
+				if err != nil {
+					fmt.Println(err)
+					continue
+				}
+				fmt.Println("Inserted:", file.Name())
 				wordData.InsertScores(fname, scores)
 			}
 		}
 	}
+	writeGob("./data.gob", wordData)
 	return wordData, nil
 }
