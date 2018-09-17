@@ -21,7 +21,7 @@ func (s *Search) NewSearch(wordData f.WordData, urlList []string) {
 }
 
 func (s *Search) Search(query []string) string {
-	scoresHolder := make([]float64, 131563)
+	scoresHolder := make([]float32, 131563)
 	for i, val := range query {
 		if i > 255 {
 			break
@@ -37,7 +37,8 @@ func (s *Search) Search(query []string) string {
 	}
 
 	bestIndex := -1
-	bestScore := 0.0
+	var bestScore float32
+	bestScore = 0.0
 	for i, val := range scoresHolder {
 		if val > bestScore {
 			bestScore = val

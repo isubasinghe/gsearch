@@ -29,7 +29,7 @@ func main() {
 		fmt.Println(err)
 		return
 	}
-	wordData, err := f.LoadDataGob("./data.gob")
+	wordData, err := f.LoadWordDataGOB("./data.gob")
 	if err != nil {
 		fmt.Println(err)
 		return

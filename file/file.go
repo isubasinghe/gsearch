@@ -13,7 +13,7 @@ import (
 // ScoreData stores the scores and indexes for a single query term
 type ScoreData struct {
 	Index int
-	Score float64
+	Score float32
 }
 
 // WordData An abstraction layer for word score data
@@ -38,7 +38,7 @@ func (w *WordData) GetScores(word string) []ScoreData {
 
 // SaveToGOB save the data structure
 func (w *WordData) SaveToGOB(fname string) {
-
+	writeGob(fname, *w)
 }
 
 func writeGob(filePath string, object interface{}) error {
@@ -101,7 +101,7 @@ func readFile(fname string) ([]ScoreData, error) {
 		return nil, err
 	}
 	for {
-		var score float64
+		var score float32
 		var index int
 		out, err := fmt.Fscanf(file, "%d %f\n", &index, &score)
 		if err != nil {
@@ -119,10 +119,11 @@ func readFile(fname string) ([]ScoreData, error) {
 	return scoreData, nil
 }
 
-func LoadDataGob(path string) (WordData, error) {
+// LoadWordDataGOB loads the data gob from a file
+func LoadWordDataGOB(path string) (WordData, error) {
 	var wordData = new(WordData)
 	wordData.NewWordData()
-	err := readGob("./data.gob", wordData)
+	err := readGob(path, wordData)
 	if err != nil {
 		return *wordData, err
 	}
