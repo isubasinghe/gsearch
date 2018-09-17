@@ -155,6 +155,5 @@ func LoadData(path string) (WordData, error) {
 			}
 		}
 	}
-	writeGob("./data.gob", wordData)
 	return wordData, nil
 }
